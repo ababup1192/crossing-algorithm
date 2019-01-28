@@ -53,4 +53,12 @@ suite =
                     |> Query.index 0
                     |> Event.simulate Event.click
                     |> Event.expect (SwapGen A 0)
+        , test "個体Bの1番目を反転させる" <|
+            \() ->
+                allTrueB
+                    |> Query.fromHtml
+                    |> Query.findAll [ Selector.tag "li" ]
+                    |> Query.index 1
+                    |> Event.simulate Event.click
+                    |> Event.expect (SwapGen B 1)
         ]
