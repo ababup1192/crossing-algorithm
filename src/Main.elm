@@ -89,9 +89,9 @@ beforeIndividualView individual gene =
         [ h2 [] [ text <| "個体" ++ individual2Text individual ]
         , ul [] <|
             (gene
-                |> List.map
-                    (\g ->
-                        li [ onClick <| SwapGen A 0 ] [ text <| bool2Text g ]
+                |> List.indexedMap
+                    (\idx g ->
+                        li [ onClick <| SwapGen individual idx ] [ text <| bool2Text g ]
                     )
             )
         ]
