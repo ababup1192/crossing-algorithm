@@ -1,4 +1,13 @@
-module Main exposing (Model, Msg(..), init, main, update, view)
+module Main exposing
+    ( Individual(..)
+    , Model
+    , Msg(..)
+    , beforeIndividualView
+    , init
+    , main
+    , update
+    , view
+    )
 
 import Browser
 import Html exposing (..)
@@ -10,6 +19,25 @@ import Html.Events exposing (..)
 -- ---------------------------
 -- MODEL
 -- ---------------------------
+
+
+type Individual
+    = A
+    | B
+
+
+type alias Gen =
+    List Bool
+
+
+individual2Text : Individual -> String
+individual2Text individual =
+    case individual of
+        A ->
+            "A"
+
+        B ->
+            "B"
 
 
 type alias Model =
@@ -42,9 +70,114 @@ update msg model =
 -- ---------------------------
 
 
+beforeIndividualView : Individual -> Gen -> Html Msg
+beforeIndividualView individual gene =
+    article []
+        [ h2 [] [ text <| "個体A" ]
+        , ul []
+            [ li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            , li [] [ text "0" ]
+            ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
-    h1 [] [ text "Hello World" ]
+    section [ class "crossing" ]
+        [ article [ class "before" ]
+            [ h1 [] [ text "対象個体 第1世代" ]
+            , article []
+                [ h2 [] [ text "個体A" ]
+                , ul []
+                    [ li [] [ text "0" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "1" ]
+                    ]
+                ]
+            , article []
+                [ h2 [] [ text "個体B" ]
+                , ul []
+                    [ li [] [ text "0" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "0" ]
+                    , li [] [ text "0" ]
+                    , li [] [ text "0" ]
+                    , li [] [ text "0" ]
+                    , li [] [ text "0" ]
+                    , li [] [ text "0" ]
+                    , li [] [ text "0" ]
+                    , li [] [ text "0" ]
+                    ]
+                ]
+            ]
+        , article []
+            [ input [ type_ "button", value "世代交代" ] []
+            ]
+        , article [ class "after" ]
+            [ h1 [] [ text "第2世代" ]
+            , article []
+                [ h2 [] [ text "個体A" ]
+                , ul []
+                    [ li []
+                        [ ul []
+                            [ li [] [ text "0" ]
+                            , li [] [ text "1" ]
+                            , li [] [ text "1" ]
+                            , li [] [ text "1" ]
+                            , li [] [ text "1" ]
+                            ]
+                        ]
+                    , li []
+                        [ ul []
+                            [ li [] [ text "1" ]
+                            , li [] [ text "1" ]
+                            , li [] [ text "1" ]
+                            , li [] [ text "1" ]
+                            , li [] [ text "1" ]
+                            ]
+                        ]
+                    ]
+                ]
+            , article []
+                [ h2 [] [ text "個体B" ]
+                , ul []
+                    [ li []
+                        [ ul []
+                            [ li [] [ text "0" ]
+                            , li [] [ text "1" ]
+                            , li [] [ text "0" ]
+                            , li [] [ text "0" ]
+                            , li [] [ text "0" ]
+                            ]
+                        ]
+                    , li []
+                        [ ul []
+                            [ li [] [ text "0" ]
+                            , li [] [ text "0" ]
+                            , li [] [ text "0" ]
+                            , li [] [ text "0" ]
+                            , li [] [ text "0" ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
 
 
 
