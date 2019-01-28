@@ -2,6 +2,7 @@ module Main exposing
     ( Individual(..)
     , Model
     , Msg(..)
+    , afterIndivisualView
     , beforeIndividualView
     , init
     , main
@@ -82,6 +83,30 @@ beforeIndividualView individual gene =
                     li [ onClick <| SwapGen individual idx ] [ text <| bool2Text g ]
                 )
         )
+
+
+afterIndivisualView : Index -> Gen -> Html Msg
+afterIndivisualView index gen =
+    ul []
+        [ li [ class "chunk" ]
+            [ ul []
+                [ li [] [ text "0" ]
+                , li [] [ text "0" ]
+                , li [] [ text "0" ]
+                , li [] [ text "0" ]
+                , li [] [ text "0" ]
+                ]
+            ]
+        , li [ class "chunk" ]
+            [ ul []
+                [ li [] [ text "1" ]
+                , li [] [ text "1" ]
+                , li [] [ text "1" ]
+                , li [] [ text "1" ]
+                , li [] [ text "1" ]
+                ]
+            ]
+        ]
 
 
 view : Model -> Html Msg

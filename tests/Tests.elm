@@ -1,4 +1,4 @@
-module Tests exposing (suite)
+module Tests exposing (afterIndividualViewTest, beforeIndividualViewTest)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -9,8 +9,8 @@ import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 
 
-suite : Test
-suite =
+beforeIndividualViewTest : Test
+beforeIndividualViewTest =
     describe "beforeIndividualView" <|
         let
             allFalseA =
@@ -47,4 +47,49 @@ suite =
                     |> Query.index 1
                     |> Event.simulate Event.click
                     |> Event.expect (SwapGen B 1)
+        ]
+
+
+afterIndividualViewTest : Test
+afterIndividualViewTest =
+    describe "afterIndivisualView" <|
+        let
+            halfFalseTrueBits =
+                afterIndivisualView 4 [ False, False, False, False, False, True, True, True, True, True ]
+
+            twoEightTrueFalseBits =
+                afterIndivisualView 1 [ True, True, False, False, False, False, False, False, False, False ]
+        in
+        [ test "遺伝子のベースは5個のFalseから出来ている" <|
+            \() ->
+                halfFalseTrueBits
+                    |> Query.fromHtml
+                    |> Query.findAll [ Selector.class "chunk" ]
+                    |> Query.first
+                    |> Query.findAll [ Selector.text "0" ]
+                    |> Query.count (Expect.equal 5)
+        , test "交叉後の遺伝子は5個のTrueから出来ている" <|
+            \() ->
+                halfFalseTrueBits
+                    |> Query.fromHtml
+                    |> Query.findAll [ Selector.class "chunk" ]
+                    |> Query.index 1
+                    |> Query.findAll [ Selector.text "1" ]
+                    |> Query.count (Expect.equal 5)
+        , test "遺伝子のベースは2個のTrueから出来ている" <|
+            \() ->
+                twoEightTrueFalseBits
+                    |> Query.fromHtml
+                    |> Query.findAll [ Selector.class "chunk" ]
+                    |> Query.first
+                    |> Query.findAll [ Selector.text "1" ]
+                    |> Query.count (Expect.equal 2)
+        , test "交叉後の遺伝子は8個のFalseから出来ている" <|
+            \() ->
+                twoEightTrueFalseBits
+                    |> Query.fromHtml
+                    |> Query.findAll [ Selector.class "chunk" ]
+                    |> Query.index 1
+                    |> Query.findAll [ Selector.text "0" ]
+                    |> Query.count (Expect.equal 8)
         ]
