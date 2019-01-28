@@ -23,6 +23,7 @@ ul, li {
     ul {
       display: flex;
       list-style: none;
+      flex-wrap: nowrap;
 
       li {
         cursor: pointer;
@@ -40,29 +41,33 @@ ul, li {
   }
 
   .after {
-    ul {
-      display: flex;
-      list-style: none;
+    article {
+      ul {
+        display: flex;
+        list-style: none;
+        flex-wrap: nowrap;
 
-      li {
-        ul {
-          display: flex;
-          list-style: none;
+        li {
+          ul {
+            display: flex;
+            list-style: none;
+            flex-wrap: nowrap;
 
-          li {
-            text-align: center;
-            font-size: 2em;
-            width: 50px;
-            height: 50px;
-            border: 1px solid black;
+            li {
+              text-align: center;
+              font-size: 2em;
+              width: 50px;
+              height: 50px;
+              border: 1px solid black;
+            }
           }
         }
-      }
 
-      li + li {
-        ul {
-          li {
-            border: 1px solid red;
+        li + li {
+          ul {
+            li {
+              border: 1px solid red;
+            }
           }
         }
       }
