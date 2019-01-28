@@ -4,6 +4,7 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Main exposing (..)
 import Test exposing (..)
+import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 
@@ -44,4 +45,12 @@ suite =
                     |> Query.find [ Selector.tag "ul" ]
                     |> Query.children [ Selector.text "1" ]
                     |> Query.count (Expect.equal 10)
+        , test "個体Aの0番目を反転させる" <|
+            \() ->
+                allFalseA
+                    |> Query.fromHtml
+                    |> Query.findAll [ Selector.tag "li" ]
+                    |> Query.index 0
+                    |> Event.simulate Event.click
+                    |> Event.expect (SwapGen A 0)
         ]

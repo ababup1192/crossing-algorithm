@@ -55,8 +55,12 @@ init _ =
 -- ---------------------------
 
 
+type alias Index =
+    Int
+
+
 type Msg
-    = NoOp
+    = SwapGen Individual Index
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -87,7 +91,7 @@ beforeIndividualView individual gene =
             (gene
                 |> List.map
                     (\g ->
-                        li [] [ text <| bool2Text g ]
+                        li [ onClick <| SwapGen A 0 ] [ text <| bool2Text g ]
                     )
             )
         ]
