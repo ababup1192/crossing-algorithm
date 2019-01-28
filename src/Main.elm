@@ -65,17 +65,18 @@ update msg model =
 -- ---------------------------
 
 
+bool2Text : Bool -> String
+bool2Text b =
+    case b of
+        True ->
+            "1"
+
+        False ->
+            "0"
+
+
 beforeIndividualView : Individual -> Gen -> Html Msg
 beforeIndividualView individual gene =
-    let
-        bool2Text b =
-            case b of
-                True ->
-                    "1"
-
-                False ->
-                    "0"
-    in
     ul [] <|
         (gene
             |> List.indexedMap
@@ -87,24 +88,31 @@ beforeIndividualView individual gene =
 
 afterIndivisualView : Index -> Gen -> Html Msg
 afterIndivisualView index gen =
+    let
+        base =
+            gen |> List.take (index + 1)
+
+        crossing =
+            gen |> List.drop (index + 1)
+    in
     ul []
         [ li [ class "chunk" ]
-            [ ul []
-                [ li [] [ text "0" ]
-                , li [] [ text "0" ]
-                , li [] [ text "0" ]
-                , li [] [ text "0" ]
-                , li [] [ text "0" ]
-                ]
+            [ ul [] <|
+                (base
+                    |> List.map
+                        (\g ->
+                            li [] [ text <| bool2Text g ]
+                        )
+                )
             ]
         , li [ class "chunk" ]
-            [ ul []
-                [ li [] [ text "1" ]
-                , li [] [ text "1" ]
-                , li [] [ text "1" ]
-                , li [] [ text "1" ]
-                , li [] [ text "1" ]
-                ]
+            [ ul [] <|
+                (crossing
+                    |> List.map
+                        (\g ->
+                            li [] [ text <| bool2Text g ]
+                        )
+                )
             ]
         ]
 
