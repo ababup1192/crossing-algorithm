@@ -72,20 +72,24 @@ update msg model =
 
 beforeIndividualView : Individual -> Gen -> Html Msg
 beforeIndividualView individual gene =
+    let
+        bool2Text b =
+            case b of
+                True ->
+                    "1"
+
+                False ->
+                    "0"
+    in
     article []
-        [ h2 [] [ text <| "個体A" ]
-        , ul []
-            [ li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            , li [] [ text "0" ]
-            ]
+        [ h2 [] [ text <| "個体" ++ individual2Text individual ]
+        , ul [] <|
+            (gene
+                |> List.map
+                    (\g ->
+                        li [] [ text <| bool2Text g ]
+                    )
+            )
         ]
 
 
