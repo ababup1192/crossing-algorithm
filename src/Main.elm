@@ -14,6 +14,7 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Random
 
 
 
@@ -31,16 +32,41 @@ type alias Gene =
     List Bool
 
 
+crossing : Index -> Gene -> Gene -> ( Gene, Gene )
+crossing index gene1 gene2 =
+    let
+        baseGene1 =
+            List.take (index + 1) gene1
+
+        crossedGene1 =
+            List.drop (index + 1) gene1
+
+        baseGene2 =
+            List.take (index + 1) gene2
+
+        crossedGene2 =
+            List.drop (index + 1) gene2
+    in
+    ( baseGene1 ++ crossedGene2, baseGene2 ++ crossedGene1 )
+
+
 type alias Model =
-    { geneA : Gene, geneB : Gene }
+    { geneA : Gene, geneB : Gene, separator : Index, generation : Int }
+
+
+genCrossingSeparator : Cmd Msg
+genCrossingSeparator =
+    Random.generate GenCrossingSeparator <| Random.int 1 8
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { geneA = [ False, False, False, False, False, False, False, False, False, False ]
       , geneB = [ False, False, False, False, False, False, False, False, False, False ]
+      , separator = 0
+      , generation = 1
       }
-    , Cmd.none
+    , genCrossingSeparator
     )
 
 
@@ -56,6 +82,8 @@ type alias Index =
 
 type Msg
     = SwapGene Individual Index
+    | GenerationalChange
+    | GenCrossingSeparator Index
 
 
 swapGene : Index -> Gene -> Gene
@@ -74,15 +102,25 @@ swapGene index gene =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ geneA, geneB } as model) =
+update msg ({ geneA, geneB, separator, generation } as model) =
     case msg of
         SwapGene individual index ->
             case individual of
                 A ->
-                    ( { model | geneA = swapGene index geneA }, Cmd.none )
+                    ( { model | geneA = swapGene index geneA }, genCrossingSeparator )
 
                 B ->
-                    ( { model | geneB = swapGene index geneB }, Cmd.none )
+                    ( { model | geneB = swapGene index geneB }, genCrossingSeparator )
+
+        GenerationalChange ->
+            let
+                ( nextGeneA, nextGeneB ) =
+                    crossing separator geneA geneB
+            in
+            ( { model | geneA = nextGeneA, geneB = nextGeneB, generation = generation + 1 }, genCrossingSeparator )
+
+        GenCrossingSeparator idx ->
+            ( { model | separator = idx }, Cmd.none )
 
 
 
@@ -144,10 +182,14 @@ afterIndivisualView index gen =
 
 
 view : Model -> Html Msg
-view { geneA, geneB } =
+view { geneA, geneB, separator, generation } =
+    let
+        ( nextGeneA, nextGeneB ) =
+            crossing 4 geneA geneB
+    in
     section [ class "crossing" ]
         [ article [ class "before" ]
-            [ h1 [] [ text "対象個体 第1世代" ]
+            [ h1 [] [ text <| "対象個体 第" ++ String.fromInt generation ++ "世代" ]
             , article []
                 [ h2 [] [ text "個体A" ]
                 , beforeIndividualView A geneA
@@ -158,17 +200,17 @@ view { geneA, geneB } =
                 ]
             ]
         , article []
-            [ input [ type_ "button", value "世代交代" ] []
+            [ input [ type_ "button", value "世代交代", onClick GenerationalChange ] []
             ]
         , article [ class "after" ]
-            [ h1 [] [ text "第2世代" ]
+            [ h1 [] [ text <| "第" ++ String.fromInt (generation + 1) ++ "世代" ]
             , article []
                 [ h2 [] [ text "個体A" ]
-                , afterIndivisualView 4 [ False, False, False, False, False, True, True, True, True, True ]
+                , afterIndivisualView separator nextGeneA
                 ]
             , article []
                 [ h2 [] [ text "個体B" ]
-                , afterIndivisualView 1 [ True, True, False, False, False, False, False, False, False, False ]
+                , afterIndivisualView separator nextGeneB
                 ]
             ]
         ]
