@@ -1,6 +1,6 @@
-# Elm 0.19 with Webpack 4, Hot Reloading & Babel 7
+# Crossing algorithm
 
-Elm dev environment with hot-loading (i.e. state is retained as you edit your code - Hot Module Reloading, HMR)). I use this daily for my professional work. Like elm-community/elm-webpack-starter but using Webpack 4.
+[交叉アルゴリズム](https://ja.wikipedia.org/wiki/遺伝的アルゴリズム#交叉（組み換え）)の[デモ](https://crossing-algorithm-elm.netlify.com)。
 
 ## Installation
 
