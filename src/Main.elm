@@ -27,17 +27,21 @@ type Individual
     | B
 
 
-type alias Gen =
+type alias Gene =
     List Bool
 
 
 type alias Model =
-    {}
+    { geneA : Gene, geneB : Gene }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( {}, Cmd.none )
+    ( { geneA = [ False, False, False, False, False, False, False, False, False, False ]
+      , geneB = [ False, False, False, False, False, False, False, False, False, False ]
+      }
+    , Cmd.none
+    )
 
 
 
@@ -51,12 +55,34 @@ type alias Index =
 
 
 type Msg
-    = SwapGen Individual Index
+    = SwapGene Individual Index
+
+
+swapGene : Index -> Gene -> Gene
+swapGene index gene =
+    let
+        b =
+            List.take index gene
+
+        target =
+            gene |> List.drop index |> List.take 1 |> List.map (\g -> not g)
+
+        a =
+            List.drop (index + 1) gene
+    in
+    b ++ target ++ a
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    ( model, Cmd.none )
+update msg ({ geneA, geneB } as model) =
+    case msg of
+        SwapGene individual index ->
+            case individual of
+                A ->
+                    ( { model | geneA = swapGene index geneA }, Cmd.none )
+
+                B ->
+                    ( { model | geneB = swapGene index geneB }, Cmd.none )
 
 
 
@@ -75,24 +101,24 @@ bool2Text b =
             "0"
 
 
-beforeIndividualView : Individual -> Gen -> Html Msg
+beforeIndividualView : Individual -> Gene -> Html Msg
 beforeIndividualView individual gene =
     ul [] <|
         (gene
             |> List.indexedMap
                 (\idx g ->
-                    li [ onClick <| SwapGen individual idx ] [ text <| bool2Text g ]
+                    li [ onClick <| SwapGene individual idx ] [ text <| bool2Text g ]
                 )
         )
 
 
-afterIndivisualView : Index -> Gen -> Html Msg
+afterIndivisualView : Index -> Gene -> Html Msg
 afterIndivisualView index gen =
     let
         base =
             gen |> List.take (index + 1)
 
-        crossing =
+        crossed =
             gen |> List.drop (index + 1)
     in
     ul []
@@ -107,7 +133,7 @@ afterIndivisualView index gen =
             ]
         , li [ class "chunk" ]
             [ ul [] <|
-                (crossing
+                (crossed
                     |> List.map
                         (\g ->
                             li [] [ text <| bool2Text g ]
@@ -118,39 +144,17 @@ afterIndivisualView index gen =
 
 
 view : Model -> Html Msg
-view model =
+view { geneA, geneB } =
     section [ class "crossing" ]
         [ article [ class "before" ]
             [ h1 [] [ text "対象個体 第1世代" ]
             , article []
                 [ h2 [] [ text "個体A" ]
-                , ul []
-                    [ li [] [ text "0" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "1" ]
-                    ]
+                , beforeIndividualView A geneA
                 ]
             , article []
                 [ h2 [] [ text "個体B" ]
-                , ul []
-                    [ li [] [ text "0" ]
-                    , li [] [ text "1" ]
-                    , li [] [ text "0" ]
-                    , li [] [ text "0" ]
-                    , li [] [ text "0" ]
-                    , li [] [ text "0" ]
-                    , li [] [ text "0" ]
-                    , li [] [ text "0" ]
-                    , li [] [ text "0" ]
-                    , li [] [ text "0" ]
-                    ]
+                , beforeIndividualView B geneB
                 ]
             ]
         , article []
@@ -160,49 +164,11 @@ view model =
             [ h1 [] [ text "第2世代" ]
             , article []
                 [ h2 [] [ text "個体A" ]
-                , ul []
-                    [ li []
-                        [ ul []
-                            [ li [] [ text "0" ]
-                            , li [] [ text "1" ]
-                            , li [] [ text "1" ]
-                            , li [] [ text "1" ]
-                            , li [] [ text "1" ]
-                            ]
-                        ]
-                    , li []
-                        [ ul []
-                            [ li [] [ text "1" ]
-                            , li [] [ text "1" ]
-                            , li [] [ text "1" ]
-                            , li [] [ text "1" ]
-                            , li [] [ text "1" ]
-                            ]
-                        ]
-                    ]
+                , afterIndivisualView 4 [ False, False, False, False, False, True, True, True, True, True ]
                 ]
             , article []
                 [ h2 [] [ text "個体B" ]
-                , ul []
-                    [ li []
-                        [ ul []
-                            [ li [] [ text "0" ]
-                            , li [] [ text "1" ]
-                            , li [] [ text "0" ]
-                            , li [] [ text "0" ]
-                            , li [] [ text "0" ]
-                            ]
-                        ]
-                    , li []
-                        [ ul []
-                            [ li [] [ text "0" ]
-                            , li [] [ text "0" ]
-                            , li [] [ text "0" ]
-                            , li [] [ text "0" ]
-                            , li [] [ text "0" ]
-                            ]
-                        ]
-                    ]
+                , afterIndivisualView 1 [ True, True, False, False, False, False, False, False, False, False ]
                 ]
             ]
         ]
