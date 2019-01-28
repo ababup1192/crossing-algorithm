@@ -19,30 +19,16 @@ suite =
             allTrueB =
                 beforeIndividualView B [ True, True, True, True, True, True, True, True, True, True ]
         in
-        [ test "個体Aである" <|
+        [ test "遺伝子が全てFalseである" <|
             \() ->
                 allFalseA
                     |> Query.fromHtml
-                    |> Query.find [ Selector.tag "h2" ]
-                    |> Query.has [ Selector.text "個体A" ]
-        , test "遺伝子が全てFalseである" <|
-            \() ->
-                allFalseA
-                    |> Query.fromHtml
-                    |> Query.find [ Selector.tag "ul" ]
                     |> Query.children [ Selector.text "0" ]
                     |> Query.count (Expect.equal 10)
-        , test "個体Bである" <|
-            \() ->
-                allTrueB
-                    |> Query.fromHtml
-                    |> Query.find [ Selector.tag "h2" ]
-                    |> Query.has [ Selector.text "個体B" ]
         , test "遺伝子が全てTrueである" <|
             \() ->
                 allTrueB
                     |> Query.fromHtml
-                    |> Query.find [ Selector.tag "ul" ]
                     |> Query.children [ Selector.text "1" ]
                     |> Query.count (Expect.equal 10)
         , test "個体Aの0番目を反転させる" <|

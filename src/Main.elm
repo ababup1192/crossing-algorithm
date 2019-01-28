@@ -30,16 +30,6 @@ type alias Gen =
     List Bool
 
 
-individual2Text : Individual -> String
-individual2Text individual =
-    case individual of
-        A ->
-            "A"
-
-        B ->
-            "B"
-
-
 type alias Model =
     {}
 
@@ -85,16 +75,13 @@ beforeIndividualView individual gene =
                 False ->
                     "0"
     in
-    article []
-        [ h2 [] [ text <| "個体" ++ individual2Text individual ]
-        , ul [] <|
-            (gene
-                |> List.indexedMap
-                    (\idx g ->
-                        li [ onClick <| SwapGen individual idx ] [ text <| bool2Text g ]
-                    )
-            )
-        ]
+    ul [] <|
+        (gene
+            |> List.indexedMap
+                (\idx g ->
+                    li [ onClick <| SwapGen individual idx ] [ text <| bool2Text g ]
+                )
+        )
 
 
 view : Model -> Html Msg
