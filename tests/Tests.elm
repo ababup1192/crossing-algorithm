@@ -52,10 +52,10 @@ beforeIndividualViewTest =
     describe "beforeIndividualView" <|
         let
             allFalseA =
-                beforeIndividualView A [ False, False, False, False, False, False, False, False, False, False ]
+                beforeIndividualView A <| List.repeat 10 False
 
             allTrueB =
-                beforeIndividualView B [ True, True, True, True, True, True, True, True, True, True ]
+                beforeIndividualView B <| List.repeat 10 True
         in
         [ test "遺伝子が全てFalseである" <|
             \() ->
@@ -93,10 +93,10 @@ afterIndividualViewTest =
     describe "afterIndivisualView" <|
         let
             halfFalseTrueBits =
-                afterIndivisualView 4 [ False, False, False, False, False, True, True, True, True, True ]
+                afterIndivisualView 4 <| List.repeat 5 False ++ List.repeat 5 True
 
             twoEightTrueFalseBits =
-                afterIndivisualView 1 [ True, True, False, False, False, False, False, False, False, False ]
+                afterIndivisualView 1 <| List.repeat 2 True ++ List.repeat 8 False
         in
         [ test "遺伝子のベースは5個のFalseから出来ている" <|
             \() ->
