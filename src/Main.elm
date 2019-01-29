@@ -54,8 +54,12 @@ crossing index gene1 gene2 =
 
 
 twoPointCrossing : Index -> Index -> Gene -> Gene -> ( Gene, Gene )
-twoPointCrossing start end gene gene2 =
-    ( [], [] )
+twoPointCrossing start end gene1 gene2 =
+    let
+        twoPointCrossing_ g1 g2 =
+            List.take start g1 ++ (g2 |> List.drop start |> List.take (end - start)) ++ List.drop end g1
+    in
+    ( twoPointCrossing_ gene1 gene2, twoPointCrossing_ gene2 gene1 )
 
 
 type alias Model =
