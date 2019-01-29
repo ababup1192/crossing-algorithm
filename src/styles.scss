@@ -35,7 +35,7 @@ ul, li {
       }
 
       li:hover {
-        border: 3px solid black;
+        border: 3px solid orange;
       }
     }
   }
@@ -45,7 +45,7 @@ ul, li {
       ul {
         display: flex;
         list-style: none;
-        flex-wrap: nowrap;
+        max-width: 500px;
 
         li {
           ul {
