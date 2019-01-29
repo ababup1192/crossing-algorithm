@@ -1,4 +1,4 @@
-module Tests exposing (afterIndividualViewTest, beforeIndividualViewTest)
+module Tests exposing (afterIndividualViewTest, beforeIndividualViewTest, crossingTest, swapGeneTest)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -7,6 +7,44 @@ import Test exposing (..)
 import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
+
+
+swapGeneTest : Test
+swapGeneTest =
+    describe "swapGeneTest" <|
+        let
+            gene =
+                List.repeat 10 True
+        in
+        [ test "遺伝子の先頭のビットをひっくり返すと、先頭だけがFalseの遺伝子ができあがる" <|
+            \() ->
+                swapGene 0 gene
+                    |> Expect.equal (False :: List.repeat 9 True)
+        , test "遺伝子の末尾のビットをひっくり返すと、末尾だけがFalseの遺伝子ができあがる" <|
+            \() ->
+                swapGene 9 gene
+                    |> Expect.equal (List.repeat 9 True ++ [ False ])
+        ]
+
+
+crossingTest : Test
+crossingTest =
+    describe "crossingTest" <|
+        let
+            geneA =
+                List.repeat 5 True ++ List.repeat 5 False
+
+            geneB =
+                List.repeat 5 False ++ List.repeat 5 True
+        in
+        [ test "geneAとgeneBを真ん中で交叉すると、全てがTrueの次世代geneAと全てがFalseの次世代geneBができる" <|
+            \() ->
+                crossing 4 geneA geneB
+                    |> Expect.equal
+                        ( List.repeat 10 True
+                        , List.repeat 10 False
+                        )
+        ]
 
 
 beforeIndividualViewTest : Test

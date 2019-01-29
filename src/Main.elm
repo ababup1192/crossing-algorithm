@@ -4,8 +4,10 @@ module Main exposing
     , Msg(..)
     , afterIndivisualView
     , beforeIndividualView
+    , crossing
     , init
     , main
+    , swapGene
     , update
     , view
     )
@@ -185,7 +187,7 @@ view : Model -> Html Msg
 view { geneA, geneB, separator, generation } =
     let
         ( nextGeneA, nextGeneB ) =
-            crossing 4 geneA geneB
+            crossing separator geneA geneB
     in
     section [ class "crossing" ]
         [ article [ class "before" ]
