@@ -172,7 +172,7 @@ afterIndivisualView index gen =
             gen |> List.drop (index + 1)
     in
     ul []
-        [ li [ class "chunk" ]
+        [ li [ class "chunk-base" ]
             [ ul [] <|
                 (base
                     |> List.map
@@ -181,7 +181,7 @@ afterIndivisualView index gen =
                         )
                 )
             ]
-        , li [ class "chunk" ]
+        , li [ class "chunk-target" ]
             [ ul [] <|
                 (crossed
                     |> List.map

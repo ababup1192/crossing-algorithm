@@ -63,12 +63,12 @@ ul, li {
           }
         }
 
-        li + li {
-          ul {
-            li {
-              border: 1px solid red;
+        li.chunk-target {
+            ul {
+              li {
+                border: 1px solid red;
+              }
             }
-          }
         }
       }
     }

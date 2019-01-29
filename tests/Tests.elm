@@ -128,32 +128,24 @@ afterIndividualViewTest =
             \() ->
                 halfFalseTrueBits
                     |> Query.fromHtml
-                    |> Query.findAll [ Selector.class "chunk" ]
-                    |> Query.first
-                    |> Query.findAll [ Selector.text "0" ]
+                    |> Query.findAll [ Selector.class "chunk-base", Selector.text "0" ]
                     |> Query.count (Expect.equal 5)
         , test "交叉後の遺伝子は5個のTrueから出来ている" <|
             \() ->
                 halfFalseTrueBits
                     |> Query.fromHtml
-                    |> Query.findAll [ Selector.class "chunk" ]
-                    |> Query.index 1
-                    |> Query.findAll [ Selector.text "1" ]
+                    |> Query.findAll [ Selector.class "chunk-target", Selector.text "1" ]
                     |> Query.count (Expect.equal 5)
         , test "遺伝子のベースは2個のTrueから出来ている" <|
             \() ->
                 twoEightTrueFalseBits
                     |> Query.fromHtml
-                    |> Query.findAll [ Selector.class "chunk" ]
-                    |> Query.first
-                    |> Query.findAll [ Selector.text "1" ]
+                    |> Query.findAll [ Selector.class "chunk-base", Selector.text "1" ]
                     |> Query.count (Expect.equal 2)
         , test "交叉後の遺伝子は8個のFalseから出来ている" <|
             \() ->
                 twoEightTrueFalseBits
                     |> Query.fromHtml
-                    |> Query.findAll [ Selector.class "chunk" ]
-                    |> Query.index 1
-                    |> Query.findAll [ Selector.text "0" ]
+                    |> Query.findAll [ Selector.class "chunk-target", Selector.text "0" ]
                     |> Query.count (Expect.equal 8)
         ]
