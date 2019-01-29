@@ -1,4 +1,10 @@
-module Tests exposing (afterIndividualViewTest, beforeIndividualViewTest, crossingTest, swapGeneTest)
+module Tests exposing
+    ( afterIndividualViewTest
+    , beforeIndividualViewTest
+    , crossingTest
+    , swapGeneTest
+    , twoPointCrossingTest
+    )
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -40,6 +46,26 @@ crossingTest =
         [ test "geneAとgeneBを真ん中で交叉すると、全てがTrueの次世代geneAと全てがFalseの次世代geneBができる" <|
             \() ->
                 crossing 4 geneA geneB
+                    |> Expect.equal
+                        ( List.repeat 10 True
+                        , List.repeat 10 False
+                        )
+        ]
+
+
+twoPointCrossingTest : Test
+twoPointCrossingTest =
+    describe "twoPointCrossingTest" <|
+        let
+            geneA =
+                List.repeat 3 True ++ List.repeat 4 False ++ List.repeat 3 True
+
+            geneB =
+                List.repeat 3 False ++ List.repeat 4 True ++ List.repeat 3 False
+        in
+        [ test "geneAとgeneBを始点が3番目・終点7番目で二点交叉すると、全てがTrueの次世代geneAと全てがFalseの次世代geneBができる" <|
+            \() ->
+                twoPointCrossing 3 7 geneA geneB
                     |> Expect.equal
                         ( List.repeat 10 True
                         , List.repeat 10 False

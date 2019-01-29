@@ -8,6 +8,7 @@ module Main exposing
     , init
     , main
     , swapGene
+    , twoPointCrossing
     , update
     , view
     )
@@ -50,6 +51,11 @@ crossing index gene1 gene2 =
             List.drop (index + 1) gene2
     in
     ( baseGene1 ++ crossedGene2, baseGene2 ++ crossedGene1 )
+
+
+twoPointCrossing : Index -> Index -> Gene -> Gene -> ( Gene, Gene )
+twoPointCrossing start end gene gene2 =
+    ( [], [] )
 
 
 type alias Model =
