@@ -202,7 +202,7 @@ view { geneA, geneB, separator, generation } =
                 ]
             ]
         , article []
-            [ input [ type_ "button", value "世代交代", onClick GenerationalChange ] []
+            [ input [ type_ "button", value "世代交代", class "pure-button pure-button-primary", onClick GenerationalChange ] []
             ]
         , article [ class "after" ]
             [ h1 [] [ text <| "第" ++ String.fromInt (generation + 1) ++ "世代" ]
