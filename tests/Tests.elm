@@ -119,32 +119,38 @@ afterIndividualViewTest =
     describe "afterIndivisualView" <|
         let
             halfFalseTrueBits =
-                afterIndivisualView 4 <| List.repeat 5 False ++ List.repeat 5 True
+                List.repeat 5 False ++ List.repeat 5 True
 
             twoEightTrueFalseBits =
-                afterIndivisualView 1 <| List.repeat 2 True ++ List.repeat 8 False
+                List.repeat 2 True ++ List.repeat 8 False
+
+            halfFalseTrueBitsView =
+                afterIndivisualView (Crossing 4) halfFalseTrueBits
+
+            twoEightTrueFalseBitsView =
+                afterIndivisualView (Crossing 1) twoEightTrueFalseBits
         in
         [ test "遺伝子のベースは5個のFalseから出来ている" <|
             \() ->
-                halfFalseTrueBits
+                halfFalseTrueBitsView
                     |> Query.fromHtml
                     |> Query.findAll [ Selector.class "chunk-base", Selector.text "0" ]
                     |> Query.count (Expect.equal 5)
         , test "交叉後の遺伝子は5個のTrueから出来ている" <|
             \() ->
-                halfFalseTrueBits
+                halfFalseTrueBitsView
                     |> Query.fromHtml
                     |> Query.findAll [ Selector.class "chunk-target", Selector.text "1" ]
                     |> Query.count (Expect.equal 5)
         , test "遺伝子のベースは2個のTrueから出来ている" <|
             \() ->
-                twoEightTrueFalseBits
+                twoEightTrueFalseBitsView
                     |> Query.fromHtml
                     |> Query.findAll [ Selector.class "chunk-base", Selector.text "1" ]
                     |> Query.count (Expect.equal 2)
         , test "交叉後の遺伝子は8個のFalseから出来ている" <|
             \() ->
-                twoEightTrueFalseBits
+                twoEightTrueFalseBitsView
                     |> Query.fromHtml
                     |> Query.findAll [ Selector.class "chunk-target", Selector.text "0" ]
                     |> Query.count (Expect.equal 8)

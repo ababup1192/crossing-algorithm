@@ -1,5 +1,6 @@
 module Main exposing
-    ( Individual(..)
+    ( CrossingMode(..)
+    , Individual(..)
     , Model
     , Msg(..)
     , afterIndivisualView
@@ -62,24 +63,29 @@ twoPointCrossing start end gene1 gene2 =
     ( twoPointCrossing_ gene1 gene2, twoPointCrossing_ gene2 gene1 )
 
 
+type CrossingMode
+    = Crossing Index
+    | TwoPointCrossing Index Index
+
+
 type alias Model =
-    { geneA : Gene, geneB : Gene, separator : Index, generation : Int }
-
-
-genCrossingSeparator : Cmd Msg
-genCrossingSeparator =
-    Random.generate GenCrossingSeparator <| Random.int 1 8
+    { geneA : Gene, geneB : Gene, crossingMode : CrossingMode, generation : Int }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { geneA = [ False, False, False, False, False, False, False, False, False, False ]
       , geneB = [ False, False, False, False, False, False, False, False, False, False ]
-      , separator = 0
+      , crossingMode = Crossing 0
       , generation = 1
       }
-    , genCrossingSeparator
+    , genCrossingSeparator (Crossing 0)
     )
+
+
+genCrossingSeparator : CrossingMode -> Cmd Msg
+genCrossingSeparator crossingMode =
+    Random.generate GenCrossingSeparator <| (Random.int 1 8 |> Random.map Crossing)
 
 
 
@@ -95,7 +101,7 @@ type alias Index =
 type Msg
     = SwapGene Individual Index
     | GenerationalChange
-    | GenCrossingSeparator Index
+    | GenCrossingSeparator CrossingMode
 
 
 swapGene : Index -> Gene -> Gene
@@ -114,25 +120,30 @@ swapGene index gene =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ geneA, geneB, separator, generation } as model) =
+update msg ({ geneA, geneB, crossingMode, generation } as model) =
     case msg of
         SwapGene individual index ->
             case individual of
                 A ->
-                    ( { model | geneA = swapGene index geneA }, genCrossingSeparator )
+                    ( { model | geneA = swapGene index geneA }, genCrossingSeparator (Crossing 0) )
 
                 B ->
-                    ( { model | geneB = swapGene index geneB }, genCrossingSeparator )
+                    ( { model | geneB = swapGene index geneB }, genCrossingSeparator (Crossing 0) )
 
         GenerationalChange ->
             let
                 ( nextGeneA, nextGeneB ) =
-                    crossing separator geneA geneB
-            in
-            ( { model | geneA = nextGeneA, geneB = nextGeneB, generation = generation + 1 }, genCrossingSeparator )
+                    case crossingMode of
+                        Crossing idx ->
+                            crossing idx geneA geneB
 
-        GenCrossingSeparator idx ->
-            ( { model | separator = idx }, Cmd.none )
+                        TwoPointCrossing idx1 idx2 ->
+                            twoPointCrossing idx1 idx2 geneA geneB
+            in
+            ( { model | geneA = nextGeneA, geneB = nextGeneB, generation = generation + 1 }, genCrossingSeparator (Crossing 0) )
+
+        GenCrossingSeparator crgMode ->
+            ( { model | crossingMode = crgMode }, Cmd.none )
 
 
 
@@ -162,42 +173,52 @@ beforeIndividualView individual gene =
         )
 
 
-afterIndivisualView : Index -> Gene -> Html Msg
-afterIndivisualView index gen =
-    let
-        base =
-            gen |> List.take (index + 1)
+afterIndivisualView : CrossingMode -> Gene -> Html Msg
+afterIndivisualView crossingMode gene =
+    case crossingMode of
+        Crossing index ->
+            let
+                base =
+                    gene |> List.take (index + 1)
 
-        crossed =
-            gen |> List.drop (index + 1)
-    in
-    ul []
-        [ li [ class "chunk-base" ]
-            [ ul [] <|
-                (base
-                    |> List.map
-                        (\g ->
-                            li [] [ text <| bool2Text g ]
+                crossed =
+                    gene |> List.drop (index + 1)
+            in
+            ul []
+                [ li [ class "chunk-base" ]
+                    [ ul [] <|
+                        (base
+                            |> List.map
+                                (\g ->
+                                    li [] [ text <| bool2Text g ]
+                                )
                         )
-                )
-            ]
-        , li [ class "chunk-target" ]
-            [ ul [] <|
-                (crossed
-                    |> List.map
-                        (\g ->
-                            li [] [ text <| bool2Text g ]
+                    ]
+                , li [ class "chunk-target" ]
+                    [ ul [] <|
+                        (crossed
+                            |> List.map
+                                (\g ->
+                                    li [] [ text <| bool2Text g ]
+                                )
                         )
-                )
-            ]
-        ]
+                    ]
+                ]
+
+        TwoPointCrossing index index2 ->
+            ul [] []
 
 
 view : Model -> Html Msg
-view { geneA, geneB, separator, generation } =
+view { geneA, geneB, crossingMode, generation } =
     let
-        ( nextGeneA, nextGeneB ) =
-            crossing separator geneA geneB
+        ( newGene1, newGene2 ) =
+            case crossingMode of
+                Crossing index ->
+                    crossing index geneA geneB
+
+                TwoPointCrossing index1 index2 ->
+                    twoPointCrossing index1 index2 geneA geneB
     in
     section [ class "crossing" ]
         [ article [ class "before" ]
@@ -218,11 +239,11 @@ view { geneA, geneB, separator, generation } =
             [ h1 [] [ text <| "第" ++ String.fromInt (generation + 1) ++ "世代" ]
             , article []
                 [ h2 [] [ text "個体A" ]
-                , afterIndivisualView separator nextGeneA
+                , afterIndivisualView crossingMode newGene1
                 ]
             , article []
                 [ h2 [] [ text "個体B" ]
-                , afterIndivisualView separator nextGeneB
+                , afterIndivisualView crossingMode newGene2
                 ]
             ]
         ]
