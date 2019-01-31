@@ -88,12 +88,12 @@ init _ =
         defaultCrossingMode =
             Crossing -1
     in
-    ( { geneA = [ False, False, False, False, False, False, False, False, False, False ]
-      , geneB = [ False, False, False, False, False, False, False, False, False, False ]
+    ( { geneA = []
+      , geneB = []
       , crossingMode = defaultCrossingMode
       , generation = 1
       }
-    , genCrossingSeparator defaultCrossingMode
+    , Cmd.batch [ genGene, genCrossingSeparator defaultCrossingMode ]
     )
 
 
@@ -123,6 +123,15 @@ genCrossingSeparator crossingMode =
                 )
 
 
+genGene : Cmd Msg
+genGene =
+    let
+        genGene_ =
+            Random.list 10 (Random.int 0 1 |> Random.map (\n -> n == 0))
+    in
+    Random.generate GenGene <| Random.pair genGene_ genGene_
+
+
 
 -- ---------------------------
 -- UPDATE
@@ -137,6 +146,7 @@ type Msg
     = SwapGene Individual Index
     | GenerationalChange
     | GenCrossingSeparator CrossingMode
+    | GenGene ( List Bool, List Bool )
     | SwapMode
 
 
@@ -192,6 +202,9 @@ update msg ({ geneA, geneB, crossingMode, generation } as model) =
                             Crossing -1
             in
             ( { model | crossingMode = nextMode, generation = 1 }, genCrossingSeparator nextMode )
+
+        GenGene ( gA, gB ) ->
+            ( { model | geneA = gA, geneB = gB }, Cmd.none )
 
 
 
