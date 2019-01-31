@@ -172,16 +172,16 @@ type Msg
 swapGene : Index -> Gene -> Gene
 swapGene index gene =
     let
-        b =
+        front =
             List.take index gene
 
         target =
             gene |> List.drop index |> List.take 1 |> List.map (\g -> not g)
 
-        a =
+        behind =
             List.drop (index + 1) gene
     in
-    b ++ target ++ a
+    front ++ target ++ behind
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
