@@ -128,16 +128,15 @@ genTwoCrossingIndex =
                 let
                     list =
                         List.range 0 9 |> List.filter (\n -> n /= x)
-
-                    h =
-                        List.head list |> Maybe.withDefault -1
-
-                    t =
-                        List.drop 1 list
                 in
-                Random.uniform h t
-                    |> Random.map
-                        (\y -> ( min x y, max x y ))
+                case list of
+                    [] ->
+                        Random.constant ( -1, -1 )
+
+                    h :: t ->
+                        Random.uniform h t
+                            |> Random.map
+                                (\y -> ( min x y, max x y ))
             )
 
 
@@ -215,13 +214,6 @@ update msg ({ geneA, geneB, crossingMode, generation, seed } as model) =
             case crossingMode of
                 Crossing _ ->
                     let
-                        ( nextIndex, nextSeed ) =
-                            Random.step genCrossingIndex seed
-                    in
-                    ( { model | crossingMode = Crossing nextIndex, seed = nextSeed }, Cmd.none )
-
-                TwoPointCrossing _ _ ->
-                    let
                         ( nextIndexPair, nextSeed ) =
                             Random.step genTwoCrossingIndex seed
 
@@ -229,6 +221,13 @@ update msg ({ geneA, geneB, crossingMode, generation, seed } as model) =
                             nextIndexPair
                     in
                     ( { model | crossingMode = TwoPointCrossing start end, seed = nextSeed }, Cmd.none )
+
+                TwoPointCrossing _ _ ->
+                    let
+                        ( nextIndex, nextSeed ) =
+                            Random.step genCrossingIndex seed
+                    in
+                    ( { model | crossingMode = Crossing nextIndex, seed = nextSeed }, Cmd.none )
 
         GenGene ( gA, gB ) ->
             ( { model | geneA = gA, geneB = gB }, Cmd.none )
