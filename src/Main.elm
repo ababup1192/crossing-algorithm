@@ -79,57 +79,77 @@ mode2Text crossingMode =
 
 
 type alias Model =
-    { geneA : Gene, geneB : Gene, crossingMode : CrossingMode, generation : Int }
+    { geneA : Gene
+    , geneB : Gene
+    , crossingMode : CrossingMode
+    , generation : Int
+    , seed : Random.Seed
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
-        defaultCrossingMode =
-            Crossing -1
+        ( index, seed ) =
+            Random.step genCrossingIndex (Random.initialSeed 999)
+
+        firstCrosing =
+            Crossing index
     in
     ( { geneA = []
       , geneB = []
-      , crossingMode = defaultCrossingMode
+      , crossingMode = firstCrosing
       , generation = 1
+      , seed = seed
       }
-    , Cmd.batch [ genGene, genCrossingSeparator defaultCrossingMode ]
+    , Cmd.batch [ Random.generate GenGene genGene ]
     )
+
+
+genGene : Random.Generator ( List Bool, List Bool )
+genGene =
+    let
+        genGene_ =
+            Random.list 10 (Random.int 0 1 |> Random.map (\n -> n == 0))
+    in
+    Random.pair genGene_ genGene_
+
+
+genCrossingIndex : Random.Generator Int
+genCrossingIndex =
+    Random.int 1 8
+
+
+genTwoCrossingIndex : Random.Generator ( Int, Int )
+genTwoCrossingIndex =
+    Random.int 0 9
+        |> Random.andThen
+            (\x ->
+                let
+                    list =
+                        List.range 0 9 |> List.filter (\n -> n /= x)
+
+                    h =
+                        List.head list |> Maybe.withDefault -1
+
+                    t =
+                        List.drop 1 list
+                in
+                Random.uniform h t
+                    |> Random.map
+                        (\y -> ( min x y, max x y ))
+            )
 
 
 genCrossingSeparator : CrossingMode -> Cmd Msg
 genCrossingSeparator crossingMode =
     case crossingMode of
         Crossing _ ->
-            Random.generate GenCrossingSeparator <| (Random.int 1 8 |> Random.map Crossing)
+            Random.generate GenCrossingSeparator <| (genCrossingIndex |> Random.map Crossing)
 
         TwoPointCrossing _ _ ->
             Random.generate GenCrossingSeparator <|
-                (Random.int 0 9
-                    |> Random.andThen
-                        (\x ->
-                            let
-                                list =
-                                    List.range 0 9 |> List.filter (\n -> n /= x)
-
-                                h =
-                                    List.head list |> Maybe.withDefault -1
-
-                                t =
-                                    List.drop 1 list
-                            in
-                            Random.uniform h t |> Random.map (\y -> TwoPointCrossing (min x y) (max x y))
-                        )
-                )
-
-
-genGene : Cmd Msg
-genGene =
-    let
-        genGene_ =
-            Random.list 10 (Random.int 0 1 |> Random.map (\n -> n == 0))
-    in
-    Random.generate GenGene <| Random.pair genGene_ genGene_
+                (genTwoCrossingIndex |> Random.map (\( start, end ) -> TwoPointCrossing start end))
 
 
 
@@ -166,7 +186,7 @@ swapGene index gene =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ geneA, geneB, crossingMode, generation } as model) =
+update msg ({ geneA, geneB, crossingMode, generation, seed } as model) =
     case msg of
         SwapGene individual index ->
             case individual of
@@ -192,16 +212,23 @@ update msg ({ geneA, geneB, crossingMode, generation } as model) =
             ( { model | crossingMode = crgMode }, Cmd.none )
 
         SwapMode ->
-            let
-                nextMode =
-                    case crossingMode of
-                        Crossing _ ->
-                            TwoPointCrossing -1 -1
+            case crossingMode of
+                Crossing _ ->
+                    let
+                        ( nextIndex, nextSeed ) =
+                            Random.step genCrossingIndex seed
+                    in
+                    ( { model | crossingMode = Crossing nextIndex, seed = nextSeed }, Cmd.none )
 
-                        TwoPointCrossing _ _ ->
-                            Crossing -1
-            in
-            ( { model | crossingMode = nextMode, generation = 1 }, genCrossingSeparator nextMode )
+                TwoPointCrossing _ _ ->
+                    let
+                        ( nextIndexPair, nextSeed ) =
+                            Random.step genTwoCrossingIndex seed
+
+                        ( start, end ) =
+                            nextIndexPair
+                    in
+                    ( { model | crossingMode = TwoPointCrossing start end, seed = nextSeed }, Cmd.none )
 
         GenGene ( gA, gB ) ->
             ( { model | geneA = gA, geneB = gB }, Cmd.none )
