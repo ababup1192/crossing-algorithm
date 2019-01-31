@@ -87,11 +87,11 @@ type alias Model =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
+init : Int -> ( Model, Cmd Msg )
+init currentTime =
     let
         ( index, seed ) =
-            Random.step genCrossingIndex (Random.initialSeed 999)
+            Random.step genCrossingIndex (Random.initialSeed currentTime)
 
         firstCrosing =
             Crossing index
@@ -381,7 +381,7 @@ view { geneA, geneB, crossingMode, generation } =
 -- ---------------------------
 
 
-main : Program () Model Msg
+main : Program Int Model Msg
 main =
     Browser.document
         { init = init
